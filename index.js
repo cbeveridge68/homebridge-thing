@@ -15,8 +15,6 @@
 
 var request = require('request');
 
-const Service, Characteristic;
-
 module.exports = function (homebridge) {
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
@@ -108,6 +106,21 @@ myMonitor.prototype = {
                                         Characteristic.PM2_5Density,
                                         value
                                 );
+                                var value = parseFloat(JSON.parse(body).field2);
+                                this.airQualityService.setCharacteristic(
+                                        Characteristic.PM10Density,
+                                        value
+                                );
+				if(value<100) {
+                                this.airQualityService.setCharacteristic(
+                                        Characteristic.AirQuality,
+                                        'excellent'
+                                ); } else {
+                                this.airQualityService.setCharacteristic(
+                                        Characteristic.AirQuality,
+                                        'poor'
+                                ); }
+
                                callback(null, value);
                         }
                 }.bind(this));
@@ -148,7 +161,7 @@ myMonitor.prototype = {
                         case "AirParticulateDensity":
                                 this.airQualityService = new Service.AirQualitySensor(this.name);
                                 this.airQualityService
-                                    .getCharacteristic(Characteristic.PM2_5Density)
+                                    .getCharacteristic(Characteristic.AirQuality)
                                     .on('get', this.getSensorParticulateDensityValue.bind(this));
                                 services.push(this.airQualityService);
                                 break;
