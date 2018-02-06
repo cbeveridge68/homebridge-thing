@@ -15,22 +15,22 @@
 
 var request = require('request');
 
+const Service, Characteristic;
 
 module.exports = function (homebridge) {
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
     homebridge.registerAccessory(
-                "homebridge-thing",  // PluginName
-                "Httpthing",      // accessoryName
-                Httpthing         // constructor
-    );
-}
+                "thing-plugin",
+                "AirQualityMonitor",
+                myMonitor);
+};
 
 
-function Httpthing(log, config) {
+function myMonitor(log, config) {
     this.log = log;
     this.debug = config["debug"] || false;
-    this.debug && this.log('Httpthing: reading config');
+    this.debug && this.log('myMonitor: reading config');
 
     // url info
     this.url = config["url"];
@@ -45,7 +45,7 @@ function Httpthing(log, config) {
     this.airQualityService;
 }
 
-Httpthing.prototype = {
+myMonitor.prototype = {
     httpRequest: function (url, method, callback) {
                 this.debug && this.log('httpRequest: '+method+' '+url);
         request({
