@@ -20,17 +20,17 @@ module.exports = function (homebridge) {
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
     homebridge.registerAccessory(
-                "homebridge-thingspeak",  // PluginName
-                "Httpthingspeak",      // accessoryName
-                Httpthingspeak         // constructor
+                "homebridge-thing",  // PluginName
+                "Httpthing",      // accessoryName
+                Httpthing         // constructor
     );
 }
 
 
-function Httpthingspeak(log, config) {
+function Httpthing(log, config) {
     this.log = log;
     this.debug = config["debug"] || false;
-    this.debug && this.log('Httpthingspeak: reading config');
+    this.debug && this.log('Httpthing: reading config');
 
     // url info
     this.url = config["url"];
@@ -45,7 +45,7 @@ function Httpthingspeak(log, config) {
     this.airQualityService;
 }
 
-Httpthingspeak.prototype = {
+Httpthing.prototype = {
     httpRequest: function (url, method, callback) {
                 this.debug && this.log('httpRequest: '+method+' '+url);
         request({
