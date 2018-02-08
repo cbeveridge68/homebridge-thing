@@ -97,7 +97,8 @@ myMonitor.prototype = {
     
     getSensorParticulateDensityValue: function (callback) {
                 this.debug && this.log('getSensorParticulateDensityValue');
-                this.httpRequest(this.url2,this.http_method,function(error, response, body) {
+                this.url = this.url2;
+                this.httpRequest(this.url,this.http_method,function(error, response, body) {
                         if (error) {
                                 this.log('HTTP get failed: %s', error.message);
                                 callback(error);
