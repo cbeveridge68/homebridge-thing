@@ -31,7 +31,7 @@ function myMonitor(log, config) {
     this.debug && this.log('myMonitor: reading config');
 
     // url info
-    this.url = config["url"];
+    this.url = config["url2"];
     this.url1 = config["url1"];
     this.url2 = config["url2"];
     this.http_method = config["http_method"] || "GET";
