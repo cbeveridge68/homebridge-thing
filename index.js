@@ -96,8 +96,6 @@ myMonitor.prototype = {
     },
     
     getSensorParticulateDensityValue: function (callback) {
-	    	this.value1=0;
-	    	this.value2=0;
                 this.debug && this.log('getSensorParticulateDensityValue');
                 this.httpRequest(this.url1,this.http_method,function(error, response, body) {
                         if (error) {
@@ -105,31 +103,18 @@ myMonitor.prototype = {
                                 callback(error);
                         } else {
                                 this.debug && this.log('HTTP success. Got result ['+body+'].');
-                                value1 = parseFloat(JSON.parse(body).field1);
+                                var value = parseFloat(JSON.parse(body).field1);
                                 this.airQualityService.setCharacteristic(
                                         Characteristic.PM2_5Density,
-                                        this.value1
+                                        value
                                 );
-                               callback(null, this.value1);
+                               callback(null, value);
                         }
-                this.httpRequest(this.url2,this.http_method,function(error, response, body) {
-                        if (error) {
-                                this.log('HTTP get failed: %s', error.message);
-                                callback(error);
-                        } else {
-                                this.debug && this.log('HTTP success. Got result ['+body+'].');
-                                var value2 = parseFloat(JSON.parse(body).field1);
-                                this.airQualityService.setCharacteristic(
-                                        Characteristic.PM10Density,
-                                        this.value2
-                                );
-                               callback(null, this.value2);
-                        }
-			if(this.value1 < 100 || this.value2 < 100) {
-        			this.airQualityService.setCharacteristic(Characteristic.AirQuality, 1);
-			} else {
-                                this.airQualityService.setCharacteristic(Characteristic.AirQuality, 5); 
-			}
+//			if(this.value1 < 100 || this.value2 < 100) {
+//       			this.airQualityService.setCharacteristic(Characteristic.AirQuality, 1);
+//			} else {
+//				this.airQualityService.setCharacteristic(Characteristic.AirQuality, 5); 
+//			}
                 }.bind(this));
     },
 
