@@ -96,8 +96,8 @@ myMonitor.prototype = {
     },
     
     getSensorParticulateDensityValue: function (callback) {
-	    	var value1=0;
-	    	var value2=0;
+	    	this.value1=0;
+	    	this.value2=0;
                 this.debug && this.log('getSensorParticulateDensityValue');
                 this.httpRequest(this.url1,this.http_method,function(error, response, body) {
                         if (error) {
@@ -108,9 +108,9 @@ myMonitor.prototype = {
                                 value1 = parseFloat(JSON.parse(body).field1);
                                 this.airQualityService.setCharacteristic(
                                         Characteristic.PM2_5Density,
-                                        value1
+                                        this.value1
                                 );
-                               callback(null, value1);
+                               callback(null, this.value1);
                         }
                 this.httpRequest(this.url2,this.http_method,function(error, response, body) {
                         if (error) {
@@ -121,11 +121,11 @@ myMonitor.prototype = {
                                 var value2 = parseFloat(JSON.parse(body).field1);
                                 this.airQualityService.setCharacteristic(
                                         Characteristic.PM10Density,
-                                        value2
+                                        this.value2
                                 );
-                               callback(null, value2);
+                               callback(null, this.value2);
                         }
-			if(value1 < 100 || value2 < 100) {
+			if(this.value1 < 100 || this.value2 < 100) {
         			this.airQualityService.setCharacteristic(Characteristic.AirQuality, 1);
 			} else {
                                 this.airQualityService.setCharacteristic(Characteristic.AirQuality, 5); 
