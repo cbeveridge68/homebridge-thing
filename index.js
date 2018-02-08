@@ -114,11 +114,11 @@ myMonitor.prototype = {
 				if(value<100) {
                                 this.airQualityService.setCharacteristic(
                                         Characteristic.AirQuality,
-                                        'excellent'
+                                        1
                                 ); } else {
                                 this.airQualityService.setCharacteristic(
                                         Characteristic.AirQuality,
-                                        'poor'
+                                        5
                                 ); }
 
                                callback(null, value);
