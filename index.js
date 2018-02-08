@@ -32,6 +32,8 @@ function myMonitor(log, config) {
 
     // url info
     this.url = config["url"];
+    this.url1 = config["url1"];
+    this.url2 = config["url2"];
     this.http_method = config["http_method"] || "GET";
     this.name = config["name"];
     this.type = config["type"];
@@ -94,37 +96,41 @@ myMonitor.prototype = {
     },
     
     getSensorParticulateDensityValue: function (callback) {
+	    	var value1=0;
+	    	var value2=0;
                 this.debug && this.log('getSensorParticulateDensityValue');
-                this.httpRequest(this.url,this.http_method,function(error, response, body) {
+                this.httpRequest(this.url1,this.http_method,function(error, response, body) {
                         if (error) {
                                 this.log('HTTP get failed: %s', error.message);
                                 callback(error);
                         } else {
                                 this.debug && this.log('HTTP success. Got result ['+body+'].');
-                                var value = parseFloat(JSON.parse(body).field1);
+                                value1 = parseFloat(JSON.parse(body).field1);
                                 this.airQualityService.setCharacteristic(
                                         Characteristic.PM2_5Density,
-                                        value
+                                        value1
                                 );
-                                var value = parseFloat(JSON.parse(body).field2);
+                               callback(null, value1);
+                        }
+                this.httpRequest(this.url2,this.http_method,function(error, response, body) {
+                        if (error) {
+                                this.log('HTTP get failed: %s', error.message);
+                                callback(error);
+                        } else {
+                                this.debug && this.log('HTTP success. Got result ['+body+'].');
+                                var value2 = parseFloat(JSON.parse(body).field1);
                                 this.airQualityService.setCharacteristic(
                                         Characteristic.PM10Density,
-                                        value
+                                        value2
                                 );
-				if(value<100) {
-                                this.airQualityService.setCharacteristic(
-                                        Characteristic.AirQuality,
-                                        1
-                                ); } else {
-                                this.airQualityService.setCharacteristic(
-                                        Characteristic.AirQuality,
-                                        5
-                                ); }
-
-                               callback(null, value);
+                               callback(null, value2);
                         }
+			if(value1 < 100 || value2 < 100) {
+        			this.airQualityService.setCharacteristic(Characteristic.AirQuality, 1);
+			} else {
+                                this.airQualityService.setCharacteristic(Characteristic.AirQuality, 5); 
+			}
                 }.bind(this));
-
     },
 
     identify: function (callback) {
