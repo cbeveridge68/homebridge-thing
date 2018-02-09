@@ -1,16 +1,4 @@
 /*
- * Homebridge-Plugin for Thingspeak Temperature and Humidity-Sensors
- * based on HttpMultisensor
- *
- * Sensor Request example URL:
- * https://api.thingspeak.com/channels/num_of_channel/field/1/last.json
- *
- * Sensor returns
- * {"{"created_at":"2017-12-23T16:30:53Z","entry_id":16113,"field1":"7.2"}"}
- *
- * License: MIT
- *
- * (C) tamasharasztosi, 2017
  */
 
 var request = require('request');
@@ -18,10 +6,7 @@ var request = require('request');
 module.exports = function (homebridge) {
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
-    homebridge.registerAccessory(
-                "thing-plugin",
-                "AirQualityMonitor",
-                myMonitor);
+    homebridge.registerAccessory("thing-plugin", "AirQualityMonitor", myMonitor);
 };
 
 
@@ -31,7 +16,7 @@ function myMonitor(log, config) {
     this.debug && this.log('myMonitor: reading config');
 
     // url info
-    this.url = config["url2"];
+    this.url = config["url"];
     this.url1 = config["url1"];
     this.url2 = config["url2"];
     this.http_method = config["http_method"] || "GET";
@@ -40,8 +25,7 @@ function myMonitor(log, config) {
     this.manufacturer = config["manufacturer"] || "Sample Manufacturer";
     this.model = config["model"] || "Sample Model";
     this.serial = config["serial"] || "Sample Serial";
-    this.temperatureService;
-    this.humidityService;
+
     this.airQualityService;
 }
 
@@ -58,47 +42,8 @@ myMonitor.prototype = {
         })
     },
 
-    getSensorTemperatureValue: function (callback) {
-                this.debug && this.log('getSensorTemperatureValue');
-                this.httpRequest(this.url,this.http_method,function(error, response, body) {
-                        if (error) {
-                                this.log('HTTP get failed: %s', error.message);
-                                callback(error);
-                        } else {
-                                this.debug && this.log('HTTP success. Got result ['+body+'].');
-                                var value = parseFloat(JSON.parse(body).field1);
-                                this.temperatureService.setCharacteristic(
-                                        Characteristic.CurrentTemperature,
-                                        value
-                                );
-                                callback(null, value);
-                        }
-                }.bind(this));
-    },
-
-    getSensorHumidityValue: function (callback) {
-                this.debug && this.log('getSensorHumidityValue');
-                this.httpRequest(this.url,this.http_method,function(error, response, body) {
-                        if (error) {
-                                this.log('HTTP get failed: %s', error.message);
-                                callback(error);
-                        } else {
-                                this.debug && this.log('HTTP success. Got result ['+body+'].');
-                                var value = parseFloat(JSON.parse(body).field2);
-                                this.temperatureService.setCharacteristic(
-                                        Characteristic.CurrentRelativeHumidity,
-                                        value
-                                );
-                               callback(null, value);
-                        }
-                }.bind(this));
-
-    },
-    
     getSensorParticulateDensityValue: function (callback) {
-                this.debug && this.log('getSensorParticulateDensityValue');
-                this.url = this.url2;
-                this.httpRequest(this.url,this.http_method,function(error, response, body) {
+                this.httpRequest(this.url1,this.http_method,function(error, response, body) {
                         if (error) {
                                 this.log('HTTP get failed: %s', error.message);
                                 callback(error);
@@ -111,11 +56,20 @@ myMonitor.prototype = {
                                 );
                                callback(null, value);
                         }
-//			if(this.value1 < 100 || this.value2 < 100) {
-//       			this.airQualityService.setCharacteristic(Characteristic.AirQuality, 1);
-//			} else {
-//				this.airQualityService.setCharacteristic(Characteristic.AirQuality, 5); 
-//			}
+               this.httpRequest(this.url2,this.http_method,function(error, response, body) {
+                        if (error) {
+                                this.log('HTTP get failed: %s', error.message);
+                                callback(error);
+                        } else {
+                                this.debug && this.log('HTTP success. Got result ['+body+'].');
+                                var value = parseFloat(JSON.parse(body).field1);
+                                this.airQualityService.setCharacteristic(
+                                        Characteristic.PM10Density,
+                                        value
+                                );
+                               callback(null, value);
+                        }
+                this.airQualityService.setCharacteristic(Characteristic.AirQuality, 1);
                 }.bind(this));
     },
 
@@ -136,20 +90,6 @@ myMonitor.prototype = {
                 services.push(informationService);
                 
                 switch (this.type) {
-                        case "CurrentTemperature":
-                                this.temperatureService = new Service.TemperatureSensor(this.name);
-                                this.temperatureService
-                                    .getCharacteristic(Characteristic.CurrentTemperature)
-                                    .on('get', this.getSensorTemperatureValue.bind(this));
-                                services.push(this.temperatureService);
-                                break;
-                        case "CurrentRelativeHumidity":
-                                this.temperatureService = new Service.HumiditySensor(this.name);
-                                this.temperatureService
-                                    .getCharacteristic(Characteristic.CurrentRelativeHumidity)
-                                    .on('get', this.getSensorHumidityValue.bind(this));
-                                services.push(this.temperatureService);
-                                break;
                         case "AirParticulateDensity":
                                 this.airQualityService = new Service.AirQualitySensor(this.name);
                                 this.airQualityService
