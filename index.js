@@ -17,8 +17,10 @@ function myMonitor(log, config) {
 
     // url info
     this.url = config["url"];
-    this.url1 = config["url1"];
-    this.url2 = config["url2"];
+    this.url_PM2 = config["url_PM2"];
+    this.debug && this.log('PM2: '+this.url_PM2);
+    this.url_PM10 = config["url_PM10"];
+    this.debug && this.log('PM10: '+this.url_PM10);
     this.http_method = config["http_method"] || "GET";
     this.name = config["name"];
     this.type = config["type"];
@@ -43,7 +45,8 @@ myMonitor.prototype = {
     },
 
     getSensorParticulateDensityValue: function (callback) {
-                this.httpRequest(this.url1,this.http_method,function(error, response, body) {
+                this.httpRequest(this.url_PM2,this.http_method,function(error, response, body) {
+                        this.debug && this.log('HTTP call. ['+this.url_PM2+'].');
                         if (error) {
                                 this.log('HTTP get failed: %s', error.message);
                                 callback(error);
@@ -56,7 +59,8 @@ myMonitor.prototype = {
                                 );
                                callback(null, value);
                         }
-               this.httpRequest(this.url2,this.http_method,function(error, response, body) {
+               this.httpRequest(this.url_PM10,this.http_method,function(error, response, body) {
+                        this.debug && this.log('HTTP call. ['+this.url_PM10+'].');
                         if (error) {
                                 this.log('HTTP get failed: %s', error.message);
                                 callback(error);
